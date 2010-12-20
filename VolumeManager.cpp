@@ -72,8 +72,9 @@ void VolumeManager::readInitialState() {
     /*
      * Read the initial mass storage enabled state
      */
-    if ((fp = fopen("/sys/devices/virtual/usb_composite/usb_mass_storage/enable", "r"))) {
-        if (fgets(state, sizeof(state), fp)) {
+//    if ((fp = fopen("/sys/devices/virtual/usb_composite/usb_mass_storage/enable", "r"))) {
+        if ((fp = fopen("/sys/devices/platform/msm_hsusb_periphera/functions/mass_storage", "r"))) {
+	if (fgets(state, sizeof(state), fp)) {
             mUsbMassStorageEnabled = !strncmp(state, "1", 1);
         } else {
             SLOGE("Failed to read usb_mass_storage enabled state (%s)", strerror(errno));
@@ -86,10 +87,12 @@ void VolumeManager::readInitialState() {
     /*
      * Read the initial USB connected state
      */
-    if ((fp = fopen("/sys/devices/virtual/switch/usb_configuration/state", "r"))) {
-        if (fgets(state, sizeof(state), fp)) {
-            mUsbConnected = !strncmp(state, "1", 1);
-        } else {
+//    if ((fp = fopen("/sys/devices/virtual/switch/usb_configuration/state", "r"))) {
+        if ((fp = fopen("/sys/devices/platform/msm_hsusb_periphera/state", "r"))) {
+	if (fgets(state, sizeof(state), fp)) {
+//            mUsbConnected = !strncmp(state, "1", 1);
+        mUsbConnected = !strncmp(state, "USB_STATE_NOTATTACHED", 1);
+	} else {
             SLOGE("Failed to read usb_configuration switch (%s)", strerror(errno));
         }
         fclose(fp);
