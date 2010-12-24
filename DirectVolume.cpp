@@ -30,7 +30,7 @@
 #include "VolumeManager.h"
 #include "ResponseCode.h"
 
-// #define PARTITION_DEBUG
+#define PARTITION_DEBUG
 
 DirectVolume::DirectVolume(VolumeManager *vm, const char *label,
                            const char *mount_point, int partIdx) :
@@ -44,7 +44,7 @@ DirectVolume::DirectVolume(VolumeManager *vm, const char *label,
     mDiskMajor = -1;
     mDiskMinor = -1;
     mDiskNumParts = 0;
-
+   
     setState(Volume::State_NoMedia);
 }
 
@@ -132,7 +132,8 @@ void DirectVolume::handleDiskAdded(const char *devpath, NetlinkEvent *evt) {
         mDiskNumParts = atoi(tmp);
     } else {
         SLOGW("Kernel block uevent missing 'NPARTS'");
-        mDiskNumParts = 1;
+//	mDiskNumParts = 1;
+        mDiskNumParts = 0;
     }
 
     char msg[255];
@@ -175,7 +176,9 @@ void DirectVolume::handlePartitionAdded(const char *devpath, NetlinkEvent *evt) 
         part_num = atoi(tmp);
     } else {
         SLOGW("Kernel block uevent missing 'PARTN'");
-        part_num = 1;
+//	GNM_CHANGE
+//        part_num = 1;
+   	part_num = ++mDiskNumParts;
     }
 
     if (part_num > mDiskNumParts) {
@@ -220,8 +223,10 @@ void DirectVolume::handleDiskChanged(const char *devpath, NetlinkEvent *evt) {
         mDiskNumParts = atoi(tmp);
     } else {
         SLOGW("Kernel block uevent missing 'NPARTS'");
-        mDiskNumParts = 1;
-    }
+//	GNM_CHANGE
+// 	mDiskNumParts = 1;
+	mDiskNumParts = 0;
+   }
 
     int partmask = 0;
     int i;
